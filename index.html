@@ -76,6 +76,7 @@ ipt.onchange = function () {
     if(file){
         EXIF.getData(file, function() {  
             Orientation = EXIF.getTag(this, 'Orientation');
+            alert("Orientation="+Orientation);
         });
         reader.onload = function (ev) {
             image.src = ev.target.result;
