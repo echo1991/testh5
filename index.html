@@ -56,12 +56,72 @@
         <div class="camera-input">
             <div class="video-button">录制视频</div>
             <input type="file" accept="video/*" id="take-video" capture="camcorder"/>
+            <div class="video-button">拍摄照片</div>
+            <input type="file" id="files"  accept="image/*" capture="user">
         </div>
   <p class="tips">视频大小为</p>
   <p class="tips" id="fileSize"></p>
         <div id="video-show"></div>
     </div>
     <script>
+        var ipt = document.getElementById('files'),
+    img = document.getElementById('preview'),
+    Orientation = null;
+ipt.onchange = function () {
+    var file = ipt.files[0],
+        reader = new FileReader(),
+        image = new Image();
+        
+    if(file){
+        EXIF.getData(file, function() {  
+            Orientation = EXIF.getTag(this, 'Orientation');
+        });
+        reader.onload = function (ev) {
+            image.src = ev.target.result;
+            image.onload = function () {
+                var imgWidth = this.width,
+                    imgHeight = this.height;     
+                var canvas = document.createElement("canvas"),
+                ctx = canvas.getContext('2d');
+                canvas.width = imgWidth;
+                canvas.height = imgHeight;
+                if(Orientation && Orientation != 1){
+                    switch(Orientation){
+                        case 6:     // 旋转90度
+                            canvas.width = imgHeight;    
+                            canvas.height = imgWidth;
+                            alert("角度="+Orientation);
+                            ctx.rotate(Math.PI / 2);
+                            // (0,-imgHeight) 从旋转原理图那里获得的起始点
+                            ctx.drawImage(this, 0, -imgHeight, imgWidth, imgHeight);
+                            break;
+                        case 3:     // 旋转180度
+                            alert("角度="+Orientation);
+                            ctx.rotate(Math.PI);    
+                            ctx.drawImage(this, -imgWidth, -imgHeight, imgWidth, imgHeight);
+                            break;
+                        case 8:     // 旋转-90度
+                            alert("角度="+Orientation);
+                            canvas.width = imgHeight;    
+                            canvas.height = imgWidth;    
+                            ctx.rotate(3 * Math.PI / 2);    
+                            ctx.drawImage(this, -imgWidth, 0, imgWidth, imgHeight);
+                            break;
+                    }
+                }else{
+                    alert("角度="+Orientation);
+                    ctx.drawImage(this, 0, 0, imgWidth, imgHeight);
+                }
+                img.src = canvas.toDataURL("image/jpeg", 0.8);
+            }
+        }
+        reader.readAsDataURL(file);
+    }
+}
+        
+        
+        
+        
         const input = document.getElementById('take-video');
         const container = document.getElementById('video-show');
         const fileSize = document.getElementById('fileSize');
@@ -95,6 +155,10 @@
                 alert('请重新上传视频');
             }
         }
+        
+        
+        
+        
     </script>
 </body>
 </html>
