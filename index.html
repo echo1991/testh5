@@ -58,6 +58,7 @@
             <input type="file" accept="video/*" id="take-video" capture="camcorder"/>
             <div class="video-button">拍摄照片</div>
             <input type="file" id="files"  accept="image/*" capture="user">
+            <img src="blank.gif" id="preview">
         </div>
   <p class="tips">视频大小为</p>
   <p class="tips" id="fileSize"></p>
@@ -87,6 +88,7 @@ ipt.onchange = function () {
                 ctx = canvas.getContext('2d');
                 canvas.width = imgWidth;
                 canvas.height = imgHeight;
+                 alert("Orientation="+Orientation);
                 if(Orientation && Orientation != 1){
                     switch(Orientation){
                         case 6:     // 旋转90度
